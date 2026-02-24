@@ -1,99 +1,49 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, render_template_string, request, redirect, url_for
+import os
+from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+
+# This creates the database file automatically
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///raitha_trade.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# Database Table
+# Database Model (The "Model")
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100))
-    price = db.Column(db.Float)
-    location = db.Column(db.String(100))
-    phone = db.Column(db.String(15))
+    crop_name = db.Column(db.String(100), nullable=False)
+    price = db.Column(db.String(50), nullable=False)
+    location = db.Column(db.String(100), nullable=False)
+    contact = db.Column(db.String(20), nullable=False)
 
-with app.app_context():
-    db.create_all()
-
-# Raitha Trade Portal - Karnataka Edition
-HTML_TEMPLATE = """
-<!DOCTYPE html>
-<html>
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .kn-header { 
-            background: linear-gradient(to bottom, #ffff00 50%, #ff0000 50%); 
-            padding: 30px; text-align: center; font-weight: bold;
-        }
-        .navbar { background: #1b5e20 !important; }
-        .card { border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .btn-karnataka { background: #ff0000; color: #ffff00; font-weight: bold; }
-    </style>
-</head>
-<body>
-    <div class="kn-header">
-        <h1>ರೈತ ಟ್ರೇಡ್ ಪೋರ್ಟಲ್</h1>
-        <h3>RAITHA TRADE PORTAL</h3>
-        <p>ಕರ್ನಾಟಕದ ರೈತರಿಗಾಗಿ (For Karnataka Farmers)</p>
-    </div>
-
-    <nav class="navbar navbar-expand navbar-dark">
-        <div class="container justify-content-center">
-            <div class="navbar-nav">
-                <a class="nav-link" href="/">ಮಾರುಕಟ್ಟೆ (Market)</a>
-                <a class="nav-link" href="/add">ಮಾರಾಟ ಮಾಡಿ (Sell)</a>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container mt-4">
-        {% if page == 'home' %}
-            <div class="row">
-                {% for p in products %}
-                <div class="col-md-4 mb-3">
-                    <div class="card p-3">
-                        <h4 class="text-success">{{ p.name }}</h4>
-                        <p>📍 {{ p.location }}</p>
-                        <h3>₹{{ p.price }}</h3>
-                        <a href="https://wa.me/91{{ p.phone }}" class="btn btn-success">WhatsApp Chat</a>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        {% elif page == 'add' %}
-            <div class="card p-4 mx-auto" style="max-width: 450px;">
-                <form action="/add" method="POST">
-                    <input type="text" name="name" class="form-control mb-2" placeholder="ಬೆಳೆ ಹೆಸರು (Crop Name)" required>
-                    <input type="number" name="price" class="form-control mb-2" placeholder="ಬೆಲೆ (Price)" required>
-                    <input type="text" name="location" class="form-control mb-2" placeholder="ಸ್ಥಳ (Location)" required>
-                    <input type="text" name="phone" class="form-control mb-2" placeholder="ವಾಟ್ಸಾಪ್ ಸಂಖ್ಯೆ (WhatsApp No)" required>
-                    <button type="submit" class="btn btn-karnataka w-100">ಲೈವ್ ಮಾಡಿ (Go Live)</button>
-                </form>
-            </div>
-        {% endif %}
-    </div>
-</body>
-</html>
-"""
-
+# Main Home Route (The "Controller")
 @app.route('/')
 def home():
-    results = Product.query.all()
-    return render_template_string(HTML_TEMPLATE, page='home', products=results)
+    query = request.args.get('q', '')
+    if query:
+        products = Product.query.filter((Product.crop_name.contains(query)) | (Product.location.contains(query))).all()
+    else:
+        products = Product.query.all()
+    # Looks inside the 'templates' folder for index.html
+    return render_template('index.html', products=products, query=query)
 
-@app.route('/add', methods=['GET', 'POST'])
-def add_product():
-    if request.method == 'POST':
-        new_p = Product(name=request.form['name'], price=request.form['price'], location=request.form['location'], phone=request.form['phone'])
-        db.session.add(new_p)
-        db.session.commit()
-        return redirect(url_for('home'))
-    return render_template_string(HTML_TEMPLATE, page='add')
+# Add Crop Route
+@app.route('/add', methods=['POST'])
+def add_crop():
+    new_product = Product(
+        crop_name=request.form.get('crop_name'),
+        price=request.form.get('price'),
+        location=request.form.get('location'),
+        contact=request.form.get('contact')
+    )
+    db.session.add(new_product)
+    db.session.commit()
+    return redirect(url_for('home'))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    with app.app_context():
+        db.create_all()
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
