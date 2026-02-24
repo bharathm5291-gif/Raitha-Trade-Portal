@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raitha Trade Portal | ರೈತ ಟ್ರೇಡ್ ಪೋರ್ಟಲ್</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .kn-header { background-color: #FFCD00; border-bottom: 5px solid #CE1126; }
+        .support-card { border-left: 5px solid #CE1126; transition: 0.3s; }
+        .support-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body class="bg-light">
+
+    <nav class="navbar kn-header shadow-sm py-3">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" width="60" class="me-3">
+                <span class="fw-bold fs-3 text-dark">ರೈತ ಟ್ರೇಡ್ <span style="color: #CE1126;">ಪೋರ್ಟಲ್</span></span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <div class="row align-items-center bg-white p-4 rounded-4 shadow-sm">
+            <div class="col-md-6">
+                <h1 class="display-4 fw-bold mb-3">ರೈತರಿಗೆ ನೇರ ಮಾರುಕಟ್ಟೆ</h1>
+                <p class="fs-5 text-muted">Direct Market Access for Farmers. Sell your crops at the best prices directly to buyers.</p>
+                <button class="btn btn-danger btn-lg px-4 me-md-2">Start Trading</button>
+            </div>
+            <div class="col-md-6">
+                <img src="{{ url_for('static', filename='images/hero_main.png') }}" class="img-fluid rounded-4 shadow" alt="Farming Hero">
+            </div>
+        </div>
+    </div>
+
+    <div class="container mb-5">
+        <h3 class="text-center mb-4 fw-bold">ನಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸಿ | Contact Support</h3>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card h-100 p-4 support-card shadow-sm">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-envelope-open-text fa-3x text-danger me-3"></i>
+                        <div>
+                            <h5 class="fw-bold">ಇಮೇಲ್ ಬೆಂಬಲ (Email Support)</h5>
+                            <p class="mb-0 text-muted">support@raithatrade.in</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100 p-4 support-card shadow-sm">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-headset fa-3x text-warning me-3"></i>
+                        <div>
+                            <h5 class="fw-bold">ಸಹಾಯವಾಣಿ (Help Desk)</h5>
+                            <p class="mb-0 text-muted">Available 24/7 for farmers.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center py-4 bg-dark text-white mt-auto">
+        <p class="mb-0">&copy; 2026 Raitha Trade Portal - Karnataka Agriculture Initiative</p>
+    </footer>
+
+</body>
+</html>
